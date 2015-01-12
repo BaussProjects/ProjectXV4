@@ -34,6 +34,7 @@ private shared Socket serverSocket;
 */
 void run(string ip, ushort port) {
 	auto server = new TcpSocket;
+	server.blocking = false;
 	server.bind(new InternetAddress(ip, port));
 	server.listen(100);
 	serverSocket = cast(shared(Socket))server;

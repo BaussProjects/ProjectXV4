@@ -287,6 +287,8 @@ void handleGeneralData(GameClient client, DataPacket packet) {
 			import core.msgconst;
 			import std.string : format;
 			client.send(createSystemMessage(format(MOTD, client.name)));
+			import std.stdio : writefln;
+			writefln("%s has logged in!", client.name);
 			break;
 		}
 			
