@@ -10,6 +10,7 @@ import std.file;
 alias fwrite = std.file.write;
 alias fread = std.file.readText;
 alias fexists = std.file.exists;
+alias fremove = std.file.remove;
 version (SAFEIO_TEST) {
 	import std.stdio : writeln;
 }
@@ -62,6 +63,15 @@ auto readLines(string fileName) {
 bool exists(string fileName) {
 	synchronized {
 		return fexists(fileName);
+	}
+}
+
+/**
+*	Removes a file thread-safe.
+*/
+void remove(string fileName) {
+	synchronized {
+		fremove(fileName);
 	}
 }
 

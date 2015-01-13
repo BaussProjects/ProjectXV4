@@ -18,6 +18,10 @@ void handleCommands(GameClient client, string[] command, string commandText) {
 	switch (toLower(command[0][1 .. $])) {
 		case "dc": cmd_dc(client); break;
 		case "mm": cmd_mm(client, command); break;
+		case "savemap": cmd_saveMap(client, commandText); break;
+		case "item": cmd_item(client, command); break;
+		case "ritem": cmd_ritem(client, command); break;
+		case "clearinv": cmd_clearinv(client); break;
 		
 		default: {
 			break;
@@ -47,8 +51,11 @@ private {
 	/**
 	*	Reports invalid formats to the client.
 	*/
-	void reportFormat(GameClient client, string format) {
-		// TODO: Report ...
+	void reportFormat(GameClient client, string frmt) {
+		import std.string : format;
+		import packets.messagecore;
+		import core.msgconst;
+			client.send(createSystemMessage(format(CMD_FORMAT, frmt)));
 	}
 	
 	/**
@@ -74,5 +81,31 @@ private {
 			return;
 		}
 		client.teleport(mapid, x, y);
+	}
+	
+	void cmd_saveMap(GameClient client, string commandText) {
+		client.map.save(commandText);
+	}
+	
+	void cmd_item(GameClient client, string[] command) {
+		uint itemid;
+		if (!tryParse!uint(command[1], itemid)) {
+			reportFormat(client, "@item id | /item id");
+			return;
+		}
+		client.inventory.addItem(itemid);
+	}
+	void cmd_ritem(GameClient client, string[] command) {
+		uint itemid;
+		ubyte count;
+		if (command.length != 3 || !tryParse!uint(command[1], itemid) || !tryParse!ubyte(command[2], count)) {
+			reportFormat(client, "@ritem id count | /ritem id count");
+			return;
+		}
+		client.inventory.removeItemById(itemid, count);
+	}
+	
+	void cmd_clearinv(GameClient client) {
+		client.inventory.clear();
 	}
 }

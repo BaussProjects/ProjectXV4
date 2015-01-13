@@ -65,6 +65,8 @@ bool playerNameTaken(string name) {
 }
 
 import entities.gameclient;
+import data.item;
+
 /**
 *	Loads player info.
 *	Params:
@@ -73,7 +75,7 @@ import entities.gameclient;
 */
 bool loadPlayer(GameClient client) {
 	try {
-		scope auto ini = new IniFile!(true)("database\\game\\players\\" ~ client.account ~ ".ini");
+		auto ini = client.playerDbFile;
 		if (!ini.exists())
 			return false;
 		ini.open();
@@ -115,6 +117,24 @@ bool loadPlayer(GameClient client) {
 		client.model = ini.read!ushort("Model");
 		client.avatar = ini.read!ushort("Avatar");
 		client.hairStyle = ini.read!ushort("HairStyle");
+		
+		import std.conv : to;
+		
+		// Inventory
+		auto invIni = client.inventoryDbFile;
+		if (invIni.exists()) {
+			invIni.open();
+			foreach (byte pos; 0 .. 40) {
+				string posStr = to!string(pos);
+				if (invIni.has(posStr)) {
+					client.inventory.addItem(
+						Item.fromString(
+							invIni.read!string(posStr)
+						)
+					);
+				}
+			}
+		}
 	}
 	catch (Throwable t) {
 		import std.stdio : writeln;
@@ -135,12 +155,50 @@ void updateCharacter(T)(GameClient client, string dbName, T value) {
 	if (!client.loaded)
 		return;
 	
-	scope auto ini = new IniFile!(true)("database\\game\\players\\" ~ client.account ~ ".ini");
+	//scope auto ini = new IniFile!(true)("database\\game\\players\\" ~ client.account ~ ".ini");
+	auto ini = client.playerDbFile;
 	if (!ini.exists())
 		return;
 	ini.open();
 	ini.write!T(dbName, value);
 	ini.close();
+}
+
+void updateCharacterInventory(GameClient client, Item item, byte pos) {
+	if (!client.loaded)
+		return;
+		
+	//scope auto ini = new IniFile!(true)("database\\game\\player_inventories\\" ~ client.account ~ ".ini");
+	auto ini = client.inventoryDbFile;
+	if (ini.exists())
+		ini.open();
+	
+	import std.conv : to;
+	ini.write!string(to!string(pos), item.toString());
+	ini.close();
+}
+
+void removeCharacterInventory(GameClient client, byte pos) {
+	if (!client.loaded)
+		return;
+		
+	//scope auto ini = new IniFile!(true)("database\\game\\player_inventories\\" ~ client.account ~ ".ini");
+	auto ini = client.inventoryDbFile;
+	if (!ini.exists())
+		return;
+	ini.open();
+	import std.conv : to;
+	ini.remove(to!string(pos));
+	ini.close();
+}
+
+void wipeCharacterInventory(GameClient client) {
+	auto ini = client.inventoryDbFile;
+	ini.clear();
+	/*import io.safeio;
+	if (!exists("database\\game\\player_inventories\\" ~ client.account ~ ".ini"))
+		return;
+	remove("database\\game\\player_inventories\\" ~ client.account ~ ".ini");*/
 }
 
 import enums.job;

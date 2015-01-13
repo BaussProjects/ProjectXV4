@@ -16,6 +16,9 @@ import enums.pkmode;
 import maps.mapobject;
 import maps.map;
 
+import data.inventory;
+import io.inifile;
+
 /**
 *	The game client.
 */
@@ -211,6 +214,14 @@ private:
 	PKMode m_pkMode;
 	
 	/**
+	*	The inventory.
+	*/
+	Inventory m_inventory;
+	
+	IniFile!(true) m_playerDbFile;
+	IniFile!(true) m_inventoryDbFile;
+	
+	/**
 	*	Calculates the mesh.
 	*/
 	void calculateMesh() {
@@ -236,9 +247,24 @@ public:
 		
 		m_crypto = new GameCrypto;
 		m_sid = sid;
+		
+		m_inventory = new Inventory(this);
+	}
+	
+	void setDb() {
+		m_inventoryDbFile = new IniFile!(true)("database\\game\\player_inventories\\" ~ account ~ ".ini");
+		m_playerDbFile = new IniFile!(true)("database\\game\\players\\" ~ account ~ ".ini");
 	}
 	
 	@property {
+		IniFile!(true) playerDbFile() { return m_playerDbFile; }
+		
+		IniFile!(true) inventoryDbFile() { return m_inventoryDbFile; }
+		/**
+		*	Gets the inventory.
+		*/
+		Inventory inventory() { return m_inventory; }
+	
 		/**
 		*	Gets the underlying socket.
 		*/

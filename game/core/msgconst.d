@@ -18,3 +18,9 @@ const string PLAYER_EXISTS = "The character name is taken!";
 const string CREATE_FAIL = "Failed to create character!";
 const string LOAD_FAIL = "Failed to load character!";
 const string MOTD = "Welcome %s to ProjectX V4!";
+
+// Commands
+const string CMD_FORMAT = "Invalid format. The correct format is %s";
+
+// Inventory
+const string INVENTORY_FULL = "Your inventory is full.";

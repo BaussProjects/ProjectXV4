@@ -74,6 +74,8 @@ void handleAuthMessage(GameClient client, DataPacket packet) {
 	client.entityUID = auth.entityUID;
 			
 	if (playerExists(account)) {
+		client.setDb();
+		
 		if (loadPlayer(client)) {
 			client.send(createLoginMessage(ANSWER_OK));
 			import packets.datetime;

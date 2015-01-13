@@ -3,8 +3,7 @@ module packets.generaldata;
 /**
 *	Enumeration for general data actions.
 */
-enum DataAction : ushort
-{
+enum DataAction : ushort {
 	ninjaStep = 0x9C,
 	endFly = 0x78,
 	GUIDialog = 0x7E,
@@ -281,14 +280,16 @@ void handleGeneralData(GameClient client, DataPacket packet) {
 			break;
 			
 		case DataAction.login: {
-			client.loaded = true;
-			client.send(generalData);
-			import packets.messagecore;
-			import core.msgconst;
-			import std.string : format;
-			client.send(createSystemMessage(format(MOTD, client.name)));
-			import std.stdio : writefln;
-			writefln("%s has logged in!", client.name);
+			if (!client.loaded) {
+				client.loaded = true;
+				client.send(generalData);
+				import packets.messagecore;
+				import core.msgconst;
+				import std.string : format;
+				client.send(createSystemMessage(format(MOTD, client.name)));
+				import std.stdio : writefln;
+				writefln("%s has logged in!", client.name);
+			}
 			break;
 		}
 			

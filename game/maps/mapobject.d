@@ -3,6 +3,7 @@ module maps.mapobject;
 import maps.map;
 import enums.entitytype;
 import enums.angle;
+import enums.maptype;
 import packets.spawnpacket;
 import packets.generaldata;
 import entities.gameclient;
@@ -181,8 +182,11 @@ public:
 	*/
 	void teleport(ushort mapId, ushort x, ushort y) {
 		auto newMap = getMap(mapId);
-		if (!newMap)
-			return;
+		if (!newMap) {
+			import std.conv : to;
+			newMap = new Map(mapId, mapId, MapType.safe, to!string(mapId));
+			addMap(newMap);
+		}
 		
 		if (m_map) {
 			m_map.remove(this);

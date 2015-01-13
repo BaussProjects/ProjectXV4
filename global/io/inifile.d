@@ -175,7 +175,16 @@ public:
 	*		key =	The key to remove.
 	*/
 	void remove(string key) {
-		m_values.remove(key);
+		static if (safe) {
+			synchronized {
+				newData = true;
+				m_values.remove(key);
+			}
+		}
+		else {
+			newData = true;
+			m_values.remove(key);
+		}
 	}
 	
 	/**
@@ -185,7 +194,23 @@ public:
 	*	Returns: True if the key exists.
 	*/
 	bool has(string key) {
-		return (m_values.get(key, null) !is null);
+		static if (safe) {
+			synchronized {
+				return (m_values.get(key, null) !is null);
+			}
+		}
+		else {
+			return (m_values.get(key, null) !is null);
+		}
+	}
+	
+	void clear() {
+		synchronized {
+			import std.file : exists, remove;
+			if (!exists(m_fileName))
+				return;
+			remove(m_fileName);
+		}
 	}
 	
 	@property {

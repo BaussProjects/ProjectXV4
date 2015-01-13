@@ -245,4 +245,23 @@ public:
 	auto findLocalItems(ushort x, ushort y) {
 		return findItemsInRange(x, y, 18);
 	}
+	
+	/**
+	*	Saves the map to a map file.
+	*	Params:
+	*		name =		The name of the map.
+	*/
+	void save(string name) {
+		m_name = name;
+		import std.conv : to;
+		import io.inifile;
+		scope auto ini = new IniFile!(true)("database\\game\\maps\\" ~ m_name ~ ".ini");
+		if (ini.exists())
+			return;
+		ini.write!ushort("MapID", m_id);
+		ini.write!ushort("Inheritance", m_inheritanceMap);
+		ini.write!ubyte("MapType", cast(ubyte)m_type);
+		ini.write!string("Name", m_name);
+		ini.close();
+	}
 }
