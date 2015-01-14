@@ -239,6 +239,7 @@ public:
 		super(EntityType.player);
 		
 		m_socket = socket;
+		m_socket.blocking = false;
 		m_expectedSize = 8;
 		m_returnSize = 8;
 		m_isHead = true;
