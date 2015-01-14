@@ -25,8 +25,9 @@ void loadMaps() {
 			string name = ini.read!string("Name");
 			
 			auto map = new Map(mapId, inheritanceId, mapType, name);
-			if (!mapExists(mapId))
+			if (!mapExists(mapId)) {
 				addMap(map);
+			}
 		}
 	}
 }

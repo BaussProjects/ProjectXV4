@@ -5,6 +5,7 @@ import maps.space;
 import maps.mapobject;
 import enums.maptype;
 import enums.entitytype;
+import dinymap.tinymap;
 
 /**
 *	The dictionary for all the global maps.
@@ -60,7 +61,7 @@ bool mapExists(ushort mapId) {
 /**
 *	A map encapsulation class.
 */
-class Map {
+class Map : TinyMap {
 private:
 	/**
 	*	The map id.

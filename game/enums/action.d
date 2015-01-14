@@ -1,5 +1,8 @@
 module enums.action;
 
+/**
+*	Enumeration of player actions.
+*/
 enum Action : ubyte {
 	none = 0x00,
 	cool = 0xe6,

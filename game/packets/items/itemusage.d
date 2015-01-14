@@ -1,5 +1,8 @@
 module packets.itemusage;
 
+/**
+*	Enumeration of item actions.
+*/
 enum ItemAction : uint {
     buyItem = 0x01,
     sellItem = 0x02,
@@ -40,11 +43,31 @@ import entities.gameclient;
 */
 class ItemUsagePacket : DataPacket {
 private:
+	/**
+	*	The uid.
+	*/
 	uint m_uid;
+	/**
+	*	The first DWORD parameter.
+	*/
 	uint m_dwParam1;
+	/**
+	*	The action.
+	*/
 	ItemAction m_action;
+	/**
+	*	The time stamp.
+	*/
 	uint m_timeStamp;
+	
+	/**
+	*	The second DWORD parameter.
+	*/
 	uint m_dwParam2;
+	
+	/**
+	*	The third DWORD parameter.
+	*/
 	uint m_dwParam3;
 public:
 	/**
@@ -63,6 +86,12 @@ public:
 		m_dwParam2 = read!uint;
 	}
 	
+	/**
+	*	Creates a new instance of ItemUsagePacket.
+	*	Params:
+	*		uid =		The uid.
+	*		action =	The action.
+	*/
 	this(uint uid, ItemAction action) {
 		super(PacketType.itemUsage, 24);
 		write!uint(uid);
@@ -71,10 +100,26 @@ public:
 	}
 	
 	@property {
+		/**
+		*	Gets the uid.
+		*/
 		uint uid() { return m_uid; }
+		/**
+		*	Gets the first DWORD parameter.
+		*/
 		uint dwParam1() { return m_dwParam1; }
+		/**
+		*	Gets the action.
+		*/
 		ItemAction action() { return m_action; }
+		/**
+		*	Gets the time stamp.
+		*/
 		uint timeStamp() { return m_timeStamp; }
+		
+		/**
+		*	Gets the second DWORD parameter.
+		*/
 		uint dwParam2() { return m_dwParam2; }
 	}
 }

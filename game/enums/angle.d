@@ -1,5 +1,8 @@
 module enums.angle;
 
+/**
+*	Enumeration of angles (directions.)
+*/
 enum Angle : ubyte {
 	southWest = 0,
 	west = 1,

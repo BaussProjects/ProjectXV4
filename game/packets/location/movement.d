@@ -79,12 +79,17 @@ void handleMovement(GameClient client, DataPacket packet) {
 	}
 	
 	int newDir = cast(int)(move.direction % 8);
-	int newX = client.x + deltaX[newDir];
-	int newY = client.y + deltaY[newDir];
+	ushort newX = cast(ushort)(client.x + deltaX[newDir]);
+	ushort newY = cast(ushort)(client.y + deltaY[newDir]);
 	
-	// check valid coords ...
+	if (!client.map.validCoord(newX, newY)) {
+		client.pullBack();
+		return;
+	}
 	
 	client.direction = cast(Angle)newDir;
+	client.lastX = client.x;
+	client.lastY = client.y;
 	client.x = cast(ushort)newX;
 	client.y = cast(ushort)newY;
 	client.updateSpawn(packet);

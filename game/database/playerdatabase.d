@@ -164,6 +164,13 @@ void updateCharacter(T)(GameClient client, string dbName, T value) {
 	ini.close();
 }
 
+/**
+*	Updates an item in the inventory of the character.
+*	Params:
+*		client = 	The client (character.)
+*		item =		The item to update.
+*		pos =		The position in the inventory.
+*/
 void updateCharacterInventory(GameClient client, Item item, byte pos) {
 	if (!client.loaded)
 		return;
@@ -178,6 +185,12 @@ void updateCharacterInventory(GameClient client, Item item, byte pos) {
 	ini.close();
 }
 
+/**
+*	Removes an item from the inventory of the character.
+*	Params:
+*		client = 	The client (character.)
+*		pos =		The position in the inventory.
+*/
 void removeCharacterInventory(GameClient client, byte pos) {
 	if (!client.loaded)
 		return;
@@ -192,6 +205,11 @@ void removeCharacterInventory(GameClient client, byte pos) {
 	ini.close();
 }
 
+/**
+*	Wipes the inventory of a character.
+*	Params:
+*		client = 	The client (character.)
+*/
 void wipeCharacterInventory(GameClient client) {
 	auto ini = client.inventoryDbFile;
 	ini.clear();

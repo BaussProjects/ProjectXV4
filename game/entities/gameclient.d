@@ -218,7 +218,14 @@ private:
 	*/
 	Inventory m_inventory;
 	
+	/**
+	*	The db file for the character.
+	*/
 	IniFile!(true) m_playerDbFile;
+	
+	/**
+	*	The db file for the inventory.
+	*/
 	IniFile!(true) m_inventoryDbFile;
 	
 	/**
@@ -252,15 +259,25 @@ public:
 		m_inventory = new Inventory(this);
 	}
 	
+	/**
+	*	Sets the db files.
+	*/
 	void setDb() {
 		m_inventoryDbFile = new IniFile!(true)("database\\game\\player_inventories\\" ~ account ~ ".ini");
 		m_playerDbFile = new IniFile!(true)("database\\game\\players\\" ~ account ~ ".ini");
 	}
 	
 	@property {
+		/**
+		*	Gets the player db file.
+		*/
 		IniFile!(true) playerDbFile() { return m_playerDbFile; }
 		
+		/**
+		*	Gets the inventory db file.
+		*/
 		IniFile!(true) inventoryDbFile() { return m_inventoryDbFile; }
+		
 		/**
 		*	Gets the inventory.
 		*/
@@ -770,7 +787,7 @@ public:
 			return;
 		}
 		
-		ubyte[] recvBuf = new ubyte[m_returnSize];
+		scope ubyte[] recvBuf = new ubyte[m_returnSize];
 		auto recv = m_socket.receive(recvBuf);
 		if (recv == 0 || recv == Socket.ERROR) {
 			disconnect("Terminated socket...");
@@ -838,6 +855,7 @@ public:
 				buffer = m_crypto.encrypt(buffer);
 				m_socket.send(buffer);
 			}
+			buffer = null;
 		}
 		catch {
 			disconnect("Failed to send...");
@@ -851,7 +869,7 @@ public:
 	*/
 	void sendToScreen(DataPacket packet) {
 		try {
-			auto locals = map.findLocalEntities(super.x, super.y);
+			scope auto locals = map.findLocalEntities(super.x, super.y);
 			if (!locals || locals.length == 0)
 				return;
 				

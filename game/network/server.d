@@ -106,7 +106,7 @@ private void handle(bool isServer)() {
 private void addToThread(GameClient client) {
 	synchronized {
 		if (clients.length >= 32) {
-			auto sthreads = cast(Thread[])socketThreads;
+			scope auto sthreads = cast(Thread[])socketThreads;
 			auto t = createThread({
 				addToThread(client);
 				handle!false();

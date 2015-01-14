@@ -16,6 +16,12 @@ void handleJump(GameClient client, GeneralDataPacket packet) {
 	
 	// check valid coords ...
 	
+	if (!client.map.validCoord(newX, newY)) {
+		client.pullBack();
+		return;
+	}
+	client.lastX = client.x;
+	client.lastY = client.y;
 	client.x = newX;
 	client.y = newY;
 	client.updateSpawn(packet);

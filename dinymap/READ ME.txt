@@ -1,0 +1,4 @@
+dinymap is a d implementation of TinyMap.
+
+Original source written in C#.
+Credits: .Kinshi

@@ -7,6 +7,9 @@ import std.conv : to;
 
 import data.item;
 
+/**
+*	Loads the base items.
+*/
 void loadItems() {
 	string text = readText("database\\game\\misc\\items.txt");
 	text = replace(text, "\r", "");

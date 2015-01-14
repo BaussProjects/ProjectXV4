@@ -35,6 +35,17 @@ private:
 	*/
 	ushort m_y;
 	
+	
+	/**
+	*	The last x axis.
+	*/
+	ushort m_lastx;
+	
+	/**
+	*	The last y axis.
+	*/
+	ushort m_lasty;
+	
 	/**
 	*	The last map.
 	*/
@@ -143,6 +154,30 @@ public:
 			m_y = value;
 		}
 		
+				/**
+		*	Gets the last x axis.
+		*/
+		ushort lastX() { return m_lastx; }
+		
+		/**
+		*	Sets the last x axis.
+		*/
+		void lastX(ushort value) {
+			m_lastx = value;
+		}
+		
+		/**
+		*	Gets the last y axis.
+		*/
+		ushort lastY() { return m_lasty; }
+		
+		/**
+		*	Sets the last y axis.
+		*/
+		void lastY(ushort value) {
+			m_lasty = value;
+		}
+		
 		/**
 		*	Gets the name.
 		*/
@@ -187,6 +222,7 @@ public:
 			newMap = new Map(mapId, mapId, MapType.safe, to!string(mapId));
 			addMap(newMap);
 		}
+		newMap.load(mapId);
 		
 		if (m_map) {
 			m_map.remove(this);
@@ -214,10 +250,17 @@ public:
 	}
 	
 	/**
+	*	Pulls the object back to its last coordinate.
+	*/
+	void pullBack() {
+		teleport(mapId, lastX, lastY);
+	}
+	
+	/**
 	*	Clears the spawn.
 	*/
 	void clearSpawn() {
-		auto locals = map.findLocalEntities(x, y);
+		scope auto locals = map.findLocalEntities(x, y);
 		if (!locals || locals.length == 0)
 			return;
 		scope auto rmvSpawn = new GeneralDataPacket(uid, 0, 0, DataAction.removeEntity);
@@ -246,7 +289,7 @@ public:
 	*	Updates the spawn.
 	*/
 	void updateSpawn(DataPacket packet = null) {
-		auto locals = map.findLocalEntities(x, y);
+		scope auto locals = map.findLocalEntities(x, y);
 		if (!locals || locals.length == 0)
 			return;
 		scope auto spawn = createSpawn();

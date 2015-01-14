@@ -8,11 +8,24 @@ import core.msgconst;
 import core.kernel;
 import entities.gameclient;
 
+/**
+*	An inventory wrapper.
+*/
 class Inventory {
 private:
+	/**
+	*	The items in the inventory.
+	*/
 	Item[byte] m_items;
+	/**
+	*	The owner of the inventory.
+	*/
 	GameClient m_owner;
 	
+	/**
+	*	Finds a valid position within the inventory.
+	*	Returns: Returns the valid position or -1 for full inventory.
+	*/
 	byte findPosition() {
 		foreach (byte pos; 0 .. 40) {
 			if (m_items.get(pos, null) is null)
@@ -21,13 +34,29 @@ private:
 		return -1;
 	}
 public:
+	/**
+	*	Creates a new instance of Inventory.
+	*	Params:
+	*		owner =		The owner of the inventory.
+	*/
 	this(GameClient owner) {
 		m_owner = owner;
 	}
 	
+	/**
+	*	Adds an item to the inventory by its id.
+	*	Params:
+	*		id =		The id of the item to add.
+	*/
 	void addItem(uint id) {
 		addItem(getKernelItem(id));
 	}
+	
+	/**
+	*	Adds an item to the inventory by an item reference.
+	*	Params:
+	*		i =		The item reference.
+	*/
 	void addItem(Item i) {
 		synchronized {
 			auto pos = findPosition();
@@ -43,6 +72,9 @@ public:
 		}
 	}
 	
+	/**
+	*	Removes an item from the inventory by its uid.
+	*/
 	void removeItemByUID(uint uid) {
 		synchronized {
 			foreach (byte pos; m_items.keys) {
@@ -58,6 +90,9 @@ public:
 		}
 	}
 	
+	/**
+	*	Removes an item from the inventory by its id and optional count.
+	*/
 	void removeItemById(uint id, ubyte count = 1) {
 		ubyte c = 0;
 		synchronized {
@@ -77,6 +112,9 @@ public:
 		}
 	}
 	
+	/**
+	*	Clears the inventory.
+	*/
 	void clear() {
 		synchronized {
 			foreach (byte pos; m_items.keys) {

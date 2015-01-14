@@ -3,6 +3,9 @@ module packets.item;
 import network.packet;
 import packets : Packet, PacketType;
 
+/**
+*	Enumeration of item modes.
+*/
 enum ItemMode : ushort {
 	def = 0x01,
 	trade = 0x02,
@@ -10,6 +13,9 @@ enum ItemMode : ushort {
 	view = 0x04
 }
 
+/**
+*	Enumeration of item positions.
+*/
 enum ItemPosition : uint {
 	inventory = 0,
 	head,
@@ -25,25 +31,33 @@ enum ItemPosition : uint {
 	defenseTalisman
 }
 	
+/**
+*	The item packet.
+*/
 class ItemPacket : DataPacket {
 public:
+	/**
+	*	Creates a new instance of item packet.
+	*	Params:
+	*		uid =			The uid of the item.
+	*		id =			The id of the item.
+	*		amount =		The amount of the item.
+	*		maxAmount =		The maximum amount of the item.
+	*		mode =			The mode of the item.
+	*		pos =			The position of the item.
+	*		plus =			The plus of the item.
+	*		bless =			The bless of the item.
+	*		enchant =		The enchant of the item.
+	*		gem1 =			The first socket gem of the item.
+	*		gem2 =			The second socket gem of the item.
+	*		rbEffect =		The reborn effect of the item.
+	*/
 	this(uint uid, uint id, short amount, short maxAmount,
 		ItemMode mode, ItemPosition pos,
 		ubyte plus = 0, ubyte bless = 0, ubyte enchant = 0,
 		ubyte gem1 = 0, ubyte gem2 =0, short rbEffect = 0) {
 		super(PacketType.item, 36);
-		/*		uint UID
-		uint ID
-		short Durability
-		short MaxDurability
-		ushort Mode
-		ushort Position
-		ubyte gem1 // 24
-		ubyte gem2
-		ubyte plus// 28
-		ubyte bless
-		ubyte enchant
-		*/
+		
 		write!uint(uid);
 		write!uint(id);
 		write!short(amount);
