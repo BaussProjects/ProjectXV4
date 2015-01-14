@@ -78,9 +78,17 @@ void handleAuthRequest(AuthClient client, DataPacket packet) {
 	auto status = authenticateAccount(request.account, request.password, entityUID);
 	
 	if (status == AccountStatus.ready) {
-		client.send(new AuthResponsePacket(entityUID, status, 5816, "192.168.0.15"));
+		import network.servermap;
+		if (serverExists(request.server)) {
+			import std.conv : to;
+			auto address = getAddress(request.server);
+			client.send(new AuthResponsePacket(entityUID, status, to!uint(address[1]), address[0]));
+		}
+		else {
+			client.send(new AuthResponsePacket(entityUID, AccountStatus.error, 9001, "10.0.0.0"));
+		}
 	}
 	else {
-		client.send(new AuthResponsePacket(entityUID, AccountStatus.error, 0, ""));
+		client.send(new AuthResponsePacket(entityUID, AccountStatus.error, 9001, "10.0.0.0"));
 	}
 }
