@@ -118,7 +118,6 @@ public:
 			if (tile is null)
 				return true; // There is no specific tile setting for the point
 			return tile.flag != TileFlag.invalid;
-			// DO HEIGHT CHECKS ...
 		}
 		return false; // The point is outside of the map
 	}
