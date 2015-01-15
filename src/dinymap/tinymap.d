@@ -116,10 +116,10 @@ public:
 		if (x < m_maxX && y < m_maxY) {
 			auto tile = m_tiles.get(p, null);
 			if (tile is null)
-				return true;
+				return true; // There is no specific tile setting for the point
 			return tile.flag != TileFlag.invalid;
 			// DO HEIGHT CHECKS ...
 		}
-		return true;
+		return false; // The point is outside of the map
 	}
 }
