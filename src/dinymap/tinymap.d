@@ -111,15 +111,15 @@ public:
 	*/
 	bool validCoord(ushort x, ushort y) {
 		if (!m_loaded)
-			return false;
+			return true;
 		auto p = TilePoint(x, y);
 		if (x < m_maxX && y < m_maxY) {
 			auto tile = m_tiles.get(p, null);
 			if (tile is null)
-				return false;
+				return true;
 			return tile.flag != TileFlag.invalid;
 			// DO HEIGHT CHECKS ...
 		}
-		return false;
+		return true;
 	}
 }
