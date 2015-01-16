@@ -245,15 +245,12 @@ public:
 			clearSpawn();
 		}
 		
-		writeln("TELESTART");
 		m_map = newMap;
 		newMap.add(this);
-		writeln("MAP ADD THIS");
 		m_x = x;
 		m_y = y;
 		updateSpawn();
 		
-		writeln("TELE UPDATE SPAWN");
 		if (etype == EntityType.player) {
 			import database.playerdatabase;
 			auto client = cast(GameClient)this;

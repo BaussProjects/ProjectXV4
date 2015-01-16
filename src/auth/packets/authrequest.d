@@ -58,15 +58,14 @@ public:
 	}
 }
 
-import packets : Packet, PacketType;
+import packets.packethandler : Packet, PacketType;
 /**
 *	Handles the auth request packet.
 *	Params:
 *		client =	The auth client.
 *		packet =	The packet.
 */
-@Packet(PacketType.authrequest)
-void handleAuthRequest(AuthClient client, DataPacket packet) {
+@Packet(PacketType.authrequest) void handleAuthRequest(AuthClient client, DataPacket packet) {
 	scope auto request = new AuthRequestPacket(packet);
 	
 	import std.stdio : writefln;

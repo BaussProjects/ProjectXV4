@@ -3,7 +3,7 @@ module packets.message;
 import network.packet;
 import entities.gameclient;
 import core.color;
-import packets : Packet, PacketType;
+import packets.packethandler : Packet, PacketType;
 
 /**
 *	Enumeration for message types.
@@ -193,8 +193,7 @@ public:
 *		client =	The game client.
 *		packet =	The packet.
 */
-@Packet(PacketType.message)
-void handleMessage(GameClient client, DataPacket packet) {
+@Packet(PacketType.message) void handleMessage(GameClient client, DataPacket packet) {
 	scope auto msg = new MessagePacket(packet);
 	import std.algorithm : canFind, startsWith;
 	

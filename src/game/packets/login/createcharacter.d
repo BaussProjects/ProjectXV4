@@ -119,15 +119,14 @@ private bool validName(string name) {
 	return true;
 }
 
-import packets : Packet, PacketType;
+import packets.packethandler : Packet, PacketType;
 /**
 *	Handles the create character packet.
 *	Params:
 *		client =	The game client.
 *		packet =	The packet.
 */
-@Packet(PacketType.createCharacter)
-void handleCreateCharacter(GameClient client, DataPacket packet) {
+@Packet(PacketType.createCharacter) void handleCreateCharacter(GameClient client, DataPacket packet) {
 	scope auto createCharacter = new CreateCharacterPacket(packet);
 	import enums.job;
 	switch (createCharacter.job) {

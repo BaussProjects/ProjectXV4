@@ -1,7 +1,7 @@
 module packets.item;
 
 import network.packet;
-import packets : Packet, PacketType;
+import packets.packethandler : Packet, PacketType;
 
 /**
 *	Enumeration of item modes.

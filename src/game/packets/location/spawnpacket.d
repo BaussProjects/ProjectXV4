@@ -1,7 +1,7 @@
 module packets.spawnpacket;
 
 import network.packet;
-import packets : Packet, PacketType;
+import packets.packethandler : Packet, PacketType;
 import core.gametime;
 
 /**

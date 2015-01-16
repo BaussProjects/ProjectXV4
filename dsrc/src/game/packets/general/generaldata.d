@@ -60,7 +60,7 @@ enum DataGUI : uint {
 }
 
 import network.packet;
-import packets : Packet, PacketType;
+import packets.packethandler : Packet, PacketType;
 import core.gametime;
 import entities.gameclient;
 
@@ -254,8 +254,7 @@ public:
 *		client =	The game client.
 *		packet =	The packet.
 */
-@Packet(PacketType.generaldata)
-void handleGeneralData(GameClient client, DataPacket packet) {
+@Packet(PacketType.generaldata) void handleGeneralData(GameClient client, DataPacket packet) {
 	scope auto generalData = new GeneralDataPacket(packet);
 	
 	import packets.general.setlocation;

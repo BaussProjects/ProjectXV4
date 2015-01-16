@@ -1,7 +1,7 @@
 module packets.passwordseed;
 
 import network.packet;
-import packets : PacketType;
+import packets.packethandler : PacketType;
 
 /**
 *	The password seed packet.

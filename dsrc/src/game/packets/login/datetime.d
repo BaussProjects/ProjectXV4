@@ -1,7 +1,7 @@
 module packets.datetime;
 
 import network.packet;
-import packets : PacketType;
+import packets.packethandler : PacketType;
 
 /**
 *	The date time packet.

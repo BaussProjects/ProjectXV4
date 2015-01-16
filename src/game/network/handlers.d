@@ -20,7 +20,7 @@ void handleConnect(GameClient client) {
 *		packet =	The received packet.
 */
 void handleReceive(GameClient client, DataPacket packet) {
-	import packets : handlePackets;
+	import packets.packethandler : handlePackets;
 	handlePackets(client, packet);
 }
 

@@ -45,15 +45,14 @@ public:
 	}
 }
 
-import packets : Packet, PacketType;
+import packets.packethandler : Packet, PacketType;
 /**
 *	Handles the auth message packet.
 *	Params:
 *		client =	The game client.
 *		packet =	The packet.
 */
-@Packet(PacketType.authmessage)
-void handleAuthMessage(GameClient client, DataPacket packet) {
+@Packet(PacketType.authmessage) void handleAuthMessage(GameClient client, DataPacket packet) {
 	scope auto auth = new AuthMessagePacket(packet);
 	
 	if (auth.entityUID == 0 || auth.key == 0) {

@@ -34,7 +34,7 @@ enum ItemAction : uint {
 }
 
 import network.packet;
-import packets : Packet, PacketType;
+import packets.packethandler : Packet, PacketType;
 import core.gametime;
 import entities.gameclient;
 		
@@ -143,8 +143,7 @@ public:
 *		client =	The game client.
 *		packet =	The packet.
 */
-@Packet(PacketType.itemUsage)
-void handleItemUsage(GameClient client, DataPacket packet) {
+@Packet(PacketType.itemUsage) void handleItemUsage(GameClient client, DataPacket packet) {
 	scope auto item = new ItemUsagePacket(packet);
 	
 	import packets.items.use;

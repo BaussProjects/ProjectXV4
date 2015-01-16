@@ -1,7 +1,7 @@
 module packets.authresponse;
 
 import network.packet;
-import packets : PacketType;
+import packets.packethandler : PacketType;
 
 /**
 *	Enumeration for account statuses.

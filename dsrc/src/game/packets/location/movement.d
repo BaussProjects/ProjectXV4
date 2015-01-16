@@ -1,7 +1,7 @@
 module packets.movement;
 
 import network.packet;
-import packets : Packet, PacketType;
+import packets.packethandler : Packet, PacketType;
 import core.gametime;
 import entities.gameclient;
 import enums.angle;
@@ -70,8 +70,7 @@ private enum deltaY = [ 1, 1, 0, -1, -1, -1, 0, 1, 0 ];
 *		client =	The game client.
 *		packet =	The packet.
 */
-@Packet(PacketType.movement)
-void handleMovement(GameClient client, DataPacket packet) {
+@Packet(PacketType.movement) void handleMovement(GameClient client, DataPacket packet) {
 	scope auto move = new MovementPacket(packet);
 	if (move.entityUID != client.uid) {
 		client.disconnect("Invalid move UID");

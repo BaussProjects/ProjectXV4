@@ -1,7 +1,7 @@
 module packets.characterinfo;
 		
 import network.packet;
-import packets : PacketType;
+import packets.packethandler : PacketType;
 import entities.gameclient;
 
 /**

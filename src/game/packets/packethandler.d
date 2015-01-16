@@ -1,4 +1,4 @@
-module packets;
+module packets.packethandler;
 
 import network.packet : DataPacket;
 import entities.gameclient;
@@ -36,23 +36,11 @@ public:
 *		packet =	The packet.
 */
 void handlePackets(GameClient client, DataPacket packet) {
-	import packets.authmessage;
-	import packets.message;
-	import packets.createcharacter;
-	import packets.generaldata;
-	import packets.movement;
-	import packets.itemusage;
-
 	packet.go(2);
 	ushort ptype = packet.read!ushort;
 	switch (ptype) {
-		/* implement __traits ... [Currently only works with a single module idk why... */
-		case PacketType.authmessage: handleAuthMessage(client, packet); break;
-		case PacketType.message: handleMessage(client, packet); break;
-		case PacketType.createCharacter: handleCreateCharacter(client, packet); break;
-		case PacketType.generaldata: handleGeneralData(client, packet); break;
-		case PacketType.movement: handleMovement(client, packet); break;
-		case PacketType.itemUsage: handleItemUsage(client, packet); break;
+	
+		aswitch ptype game\packets @Packet client,packet
 		
 		default: {
 			import std.stdio : writeln;

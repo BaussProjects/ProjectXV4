@@ -71,7 +71,7 @@ enum UpdateType : uint
 }*/
 		
 import network.packet;
-import packets : PacketType;
+import packets.packethandler : PacketType;
 
 /**
 *	The update packet.
