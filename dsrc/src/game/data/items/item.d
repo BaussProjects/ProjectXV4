@@ -709,6 +709,10 @@ public:
 		return (id >= 200000 && id <= 200420);
 	}
 	
+	bool isGMRobe() {
+		return id == 137310;
+	}
+	
 	/**
 	*	Checks whether the item is miscellaneous.
 	*	Returns: True if it is.
@@ -721,8 +725,8 @@ public:
 	        !isBow() && !isBoots() &&
 	        !isGarment() && !isFan() &&
 	        !isTower() && !isBottle() &&
-	        !isSteed() && !isMountArmor());
-	}	
+	        !isSteed() && !isMountArmor() && !isGMRobe());
+	}		
 	
 	/**
 	*	Copies the item stats into a brand new item.
@@ -759,6 +763,7 @@ public:
 	}
 	
 	import packets.item;
+	
 	/**
 	*	Sends the item to the client.
 	*/

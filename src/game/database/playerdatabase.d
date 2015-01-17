@@ -118,24 +118,6 @@ bool loadPlayer(GameClient client) {
 		client.avatar = ini.read!ushort("Avatar");
 		client.hairStyle = ini.read!ushort("HairStyle");
 		
-		import std.conv : to;
-		
-		// Inventory
-		auto invIni = client.inventoryDbFile;
-		if (invIni.exists()) {
-			invIni.open();
-			foreach (byte pos; 0 .. 40) {
-				string posStr = to!string(pos);
-				if (invIni.has(posStr)) {
-					client.inventory.addItem(
-						Item.fromString(
-							invIni.read!string(posStr)
-						), pos
-					);
-				}
-			}
-		}
-		
 		client.updateStatPoints();
 		client.updateBaseStats();
 	}
@@ -145,6 +127,41 @@ bool loadPlayer(GameClient client) {
 		return false;
 	}
 	return true;
+}
+
+void loadInventory(GameClient client) {
+	auto invIni = client.inventoryDbFile;
+	if (invIni.exists()) {
+		invIni.open();
+		foreach (byte pos; 0 .. 40) {
+			string posStr = to!string(pos);
+			if (invIni.has(posStr)) {
+				client.inventory.addItem(
+					Item.fromString(
+						invIni.read!string(posStr)
+					), pos
+				);
+			}
+		}
+	}
+}
+
+void loadEquipments(GameClient client) {
+	auto eqpIni = client.equipmentsDbFile;
+	if (eqpIni.exists()) {
+		eqpIni.open();
+		import packets.item : ItemPosition;
+		foreach (ushort pos; ItemPosition.head .. ItemPosition.attackTalisman) {
+			string posStr = to!string(pos);
+			if (eqpIni.has(posStr)) {
+				client.equipments.equip(
+					Item.fromString(
+						eqpIni.read!string(posStr)
+					), cast(ItemPosition)pos, true
+				);
+			}
+		}
+	}
 }
 
 /**
@@ -216,10 +233,55 @@ void removeCharacterInventory(GameClient client, byte pos) {
 void wipeCharacterInventory(GameClient client) {
 	auto ini = client.inventoryDbFile;
 	ini.clear();
-	/*import io.safeio;
-	if (!exists("database\\game\\player_inventories\\" ~ client.account ~ ".ini"))
+}
+
+/**
+*	Updates an item in the equipments of the character.
+*	Params:
+*		client = 	The client (character.)
+*		item =		The item to update.
+*		pos =		The position in the inventory.
+*/
+void updateCharacterEquipments(GameClient client, Item item, ushort pos) {
+	if (!client.loaded)
 		return;
-	remove("database\\game\\player_inventories\\" ~ client.account ~ ".ini");*/
+		
+	auto ini = client.equipmentsDbFile;
+	if (ini.exists())
+		ini.open();
+	
+	import std.conv : to;
+	ini.write!string(to!string(pos), item.toString());
+	ini.close();
+}
+
+/**
+*	Removes an item from the equipments of the character.
+*	Params:
+*		client = 	The client (character.)
+*		pos =		The position in the inventory.
+*/
+void removeCharacterEquipments(GameClient client, ushort pos) {
+	if (!client.loaded)
+		return;
+		
+	auto ini = client.equipmentsDbFile;
+	if (!ini.exists())
+		return;
+	ini.open();
+	import std.conv : to;
+	ini.remove(to!string(pos));
+	ini.close();
+}
+
+/**
+*	Wipes the equipments of a character.
+*	Params:
+*		client = 	The client (character.)
+*/
+void wipeCharacterEquipments(GameClient client) {
+	auto ini = client.equipmentsDbFile;
+	ini.clear();
 }
 
 import enums.job;

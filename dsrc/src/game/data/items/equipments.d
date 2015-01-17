@@ -27,17 +27,68 @@ public:
 		}
 	}
 	
-	bool equip(Item item, ItemPosition pos) {
+	bool equip(Item item, ItemPosition pos, bool force = false) {
 		synchronized {
-			if (contains(pos)) {
-				if (!unequip(pos))
+			if (!force) {
+				if (pos == ItemPosition.left && !contains(ItemPosition.right)) {
 					return false;
+				}
+				// do sex check (also get that shit from item data ...)
+				
+				// do job check
+				
+				// do prof check
+				
+				// do pos check ...
+				if (item.isHeadGear() && pos != ItemPosition.head ||
+					item.isArmor() && pos != ItemPosition.armor ||
+					item.isNecklace() && pos != ItemPosition.necklace ||
+					item.isRing() && pos != ItemPosition.ring ||
+					item.isBoots() && pos != ItemPosition.boots ||
+					item.isBottle() && pos != ItemPosition.bottle ||
+					item.isGarment() && pos != ItemPosition.garment) {
+					return false;
+				}
+				
+				if (item.isTwoHand() && contains(ItemPosition.left)) {
+					return false;
+				}
+				
+				if (item.isTwoHand() && pos != ItemPosition.right ||
+					item.isOneHand() && pos != (ItemPosition.right || ItemPosition.left)) {
+					return false;
+				}
+				if (item.isOneHand() && pos == ItemPosition.left && m_owner.level < 40) {
+					return false;
+				}
+				if (item.isShield() && pos != ItemPosition.left ||
+					item.isShield() && m_owner.level < 40) {
+					return false;
+				}
+					
+				// do stats check ...
+				if (item.level > 70 || m_owner.reborns == 0) {
+					if (item.strength > m_owner.strength ||
+						item.agility > m_owner.agility ||
+						item.spirit > m_owner.spirit) {
+						return false;
+					}
+				}
+				
+				if (contains(pos)) {
+					if (!unequip(pos))
+						return false;
+				}
 			}
 			import std.stdio : writeln;
 			m_equips[pos] = item;
 			m_owner.updateBaseStats();
 			item.send(m_owner, ItemMode.def, pos);
 			m_owner.send(new ItemUsagePacket(item.uid, ItemAction.equip, cast(uint)pos));
+			m_owner.send(new ItemUsagePacket(item.uid, ItemAction.setEquipPosition, cast(uint)pos));
+			m_owner.updateSpawn();
+			import database.playerdatabase;
+			updateCharacterEquipments(m_owner, item, cast(ushort)pos);
 			return true;
 		}
 	}
@@ -57,6 +108,9 @@ public:
 					m_owner.updateBaseStats();
 					item.send(m_owner, ItemMode.def, pos);
 					m_owner.send(new ItemUsagePacket(item.uid, ItemAction.unequip, cast(uint)pos));
+					m_owner.updateSpawn();
+					import database.playerdatabase;
+					removeCharacterEquipments(m_owner, cast(ushort)pos);
 					return true;
 				}
 				else

@@ -233,6 +233,11 @@ private:
 	*	The db file for the inventory.
 	*/
 	IniFile!(true) m_inventoryDbFile;
+
+	/**
+	*	The db file for the equipments.
+	*/
+	IniFile!(true) m_equipmentsDbFile;
 	
 	/**
 	*	Calculates the mesh.
@@ -270,8 +275,9 @@ public:
 	*	Sets the db files.
 	*/
 	void setDb() {
-		m_inventoryDbFile = new IniFile!(true)("database\\game\\player_inventories\\" ~ account ~ ".ini");
 		m_playerDbFile = new IniFile!(true)("database\\game\\players\\" ~ account ~ ".ini");
+		m_inventoryDbFile = new IniFile!(true)("database\\game\\player_inventories\\" ~ account ~ ".ini");
+		m_equipmentsDbFile = new IniFile!(true)("database\\game\\player_equipments\\" ~ account ~ ".ini");
 	}
 	
 	@property {
@@ -284,6 +290,11 @@ public:
 		*	Gets the inventory db file.
 		*/
 		IniFile!(true) inventoryDbFile() { return m_inventoryDbFile; }
+		
+		/**
+		*	Gets the equipments db file.
+		*/
+		IniFile!(true) equipmentsDbFile() { return m_equipmentsDbFile; }
 		
 		/**
 		*	Gets the inventory.

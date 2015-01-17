@@ -220,29 +220,3 @@ public:
 		string[] keys() { return m_values.keys; }
 	}
 }
-
-version (INIFILE_TEST) {
-	unittest {
-		writeln("BEGINS INIFILE_TEST...");
-		
-		try {
-			auto iniFile = new IniFile!(false)("test.ini"); // Creates a new non-threadsafe inifile.
-			if (iniFile.exists()) { // Checks if the ini file exists.
-				iniFile.open(); // If the file exists open and read it.
-				
-				iniFile.write!string("str","Hello Inifile!"); // Add or update the value or "str" to "Hello Inifile!"
-			}
-			else {
-				// If the ini file doesn't exist
-				iniFile.write!int("value", 100); // Add the key "value" with the value "100" to the inifile.
-				iniFile.write!string("str", "Hello World!"); // Add the key "str" with the value "Hello World!" to the inifile.
-			}
-			iniFile.close(); // Close the inifile. Clears the values and writes them to the file if any changes has been made.
-		}
-		catch (Throwable t) {
-			writeln(t);
-		}
-		
-		writeln("INIFILE_TEST ENDED...");
-	}
-}

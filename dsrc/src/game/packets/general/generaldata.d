@@ -292,9 +292,13 @@ public:
 				import std.string : format;
 				client.send(createSystemMessage(format(MOTD, client.name)));
 				
+				import database.playerdatabase;
+				loadInventory(client);
+				loadEquipments(client);
+				
+				client.teleport(client.map, client.x, client.y); // update screen ... cba to debug this right now... temp fix
 				import std.stdio : writefln;
 				writefln("[LV.%s]%s has logged in!", client.level, client.name);
-				client.teleport(client.map, client.x, client.y); // update screen ... cba to debug this right now... temp fix
 			}
 			break;
 		}
