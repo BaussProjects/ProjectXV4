@@ -1,5 +1,9 @@
 module threading.task;
 
+import std.parallelism;
+
+import threading.thread;
+
 private class Task {
 	void function() F;
 	void delegate() D;
@@ -27,18 +31,16 @@ private class Task {
 	}
 }
 
-private shared Task[int] _tasks;
+private shared Task[uint] _tasks;
 import core.thread : Thread;
-private Thread taskThread;
+private shared Thread taskThread;
+
 private void handle() {
 	while (true) {
-		import threading.thread;
-		synchronized {
-			auto tasks = cast(Task[int])_tasks;
-			foreach (task; tasks) {
-				if (task.exec()) {
-					tasks.remove(task.taskId);
-					_tasks = cast(shared(Task[int]))tasks;
+		foreach(i, ref task; taskPool.parallel(_tasks.values)) {
+			if ((cast(Task)task).exec()) {
+				synchronized {
+					_tasks.remove(cast(shared(uint))task.taskId);
 				}
 			}
 		}
@@ -50,17 +52,18 @@ void addTask(void function() F, int delayedTicks = 1) {
 	synchronized {
 		if (taskThread is null) {
 			import threading.thread;
-			taskThread = createThread(&handle);
-			taskThread.start();
+			auto t = createThread(&handle);
+			t.start();
+			taskThread = cast(shared(Thread))t;
 		}
 		
 		auto task = new Task;
 		task.F = F;
 		task.delayedTicks = delayedTicks;
 		
-		auto tasks = cast(Task[int])_tasks;
+		auto tasks = cast(Task[uint])_tasks;
 		tasks[task.taskId] = task;
-		_tasks = cast(shared(Task[int]))tasks;
+		_tasks = cast(shared(Task[uint]))tasks;
 	}
 }
 
@@ -68,16 +71,17 @@ void addTask(void delegate() D, int delayedTicks = 1) {
 	synchronized {
 		if (taskThread is null) {
 			import threading.thread;
-			taskThread = createThread(&handle);
-			taskThread.start();
+			auto t = createThread(&handle);
+			t.start();
+			taskThread = cast(shared(Thread))t;
 		}
 		
 		auto task = new Task;
 		task.D = D;
 		task.delayedTicks = delayedTicks;
 		
-		auto tasks = cast(Task[int])_tasks;
+		auto tasks = cast(Task[uint])_tasks;
 		tasks[task.taskId] = task;
-		_tasks = cast(shared(Task[int]))tasks;
+		_tasks = cast(shared(Task[uint]))tasks;
 	}
 }

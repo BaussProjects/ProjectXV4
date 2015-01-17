@@ -1,5 +1,7 @@
 module maps.mapobject;
 
+import std.parallelism : taskPool;
+
 import maps.map;
 import enums.entitytype;
 import enums.angle;
@@ -212,9 +214,7 @@ public:
 	*		y = 		The y coord to teleport to.
 	*/
 	void teleport(ushort mapId, ushort x, ushort y) {
-		writeln("TELEPORT START");
 		if (!map || mapId != map.mapId || etype == EntityType.player && !(cast(GameClient)this).loaded) {
-			writeln("NEW MAP");
 			// New map ...
 			auto newMap = getMap(mapId);
 			if (!newMap) {
@@ -226,10 +226,8 @@ public:
 			teleport(newMap, x, y);
 		}
 		else if (x != m_x || y != m_y) {
-			writeln("EXISTING MAP");
 			teleport(map, x, y); // New coordinates only ...
 		}
-		writeln("TELEPORT END");
 	}
 	
 	/**
@@ -242,7 +240,7 @@ public:
 	void teleport(Map newMap, ushort x, ushort y) {		
 		if (m_map) {
 			m_map.remove(this);
-			clearSpawn();
+		//	clearSpawn();
 		}
 		
 		m_map = newMap;
@@ -272,96 +270,130 @@ public:
 		teleport(mapId, lastX, lastY);
 	}
 	
-	/**
-	*	Clears the spawn.
-	*/
 	void clearSpawn() {
-		if (!map)
-			return;
-		
 		scope auto locals = (map.findLocalEntities(x, y) ~ map.findLocalItems(x, y) ~ getScreenObjects());
 		if (!locals || locals.length == 0)
 			return;
+		m_screenObjects = null;
+		
 		DataPacket rmvSpawn;
 		scope(exit) rmvSpawn = null;
-		
-		import packets.spawnpacket;
-			
 		if (etype == EntityType.item)
-			rmvSpawn = new ItemSpawnPacket(uid, 0, 0, 0, ItemDropType.visible);
+			rmvSpawn = new ItemSpawnPacket(uid, 0, 0, 0, ItemDropType.remove);
 		else
 			rmvSpawn = new GeneralDataPacket(uid, 0, 0, DataAction.removeEntity);
-		
-		synchronized {
-			foreach (local; locals) {
-				if (local.uid == uid)
-					continue;
-				
-				bool inScreen = m_screenObjects.contains(local.uid);
-				if (inScreen)
-					m_screenObjects.remove(local.uid);
-				
-				if (etype == EntityType.player) {
-					auto client = cast(GameClient)this;
-					DataPacket localRmvSpawn;
-					scope(exit) localRmvSpawn = null;
-					
-					if (local.etype == EntityType.item)
-						localRmvSpawn = new ItemSpawnPacket(uid, 0, 0, 0, ItemDropType.visible);
-					else
-						localRmvSpawn = new GeneralDataPacket(local.uid, 0, 0, DataAction.removeEntity);
+			
+		foreach(i, ref local; taskPool.parallel(locals)) {
+			if (local.uid == uid)
+				continue;
+			
+			if (local.m_screenObjects.contains(uid))
+				local.m_screenObjects.remove(uid);
 						
-					client.send(localRmvSpawn);
-				}
-					
-				if (local.etype == EntityType.player) {
-					auto player = cast(GameClient)local;
-					player.send(rmvSpawn);
-				}
+			if (etype == EntityType.player) {
+				DataPacket localRmvSpawn;
+				scope(exit) localRmvSpawn = null;
+				
+				if (local.etype == EntityType.item)
+					localRmvSpawn = new ItemSpawnPacket(local.uid, 0, 0, 0, ItemDropType.remove);
+				else
+					localRmvSpawn = new GeneralDataPacket(local.uid, 0, 0, DataAction.removeEntity);
+				
+				auto client = cast(GameClient)this;
+				client.send(localRmvSpawn);
+			}
+			
+			if (local.etype == EntityType.player) {
+				auto localClient = cast(GameClient)local;
+				localClient.send(rmvSpawn);
 			}
 		}
 	}
 	
-	import network.packet;
-	/**
-	*	Updates the spawn.
-	*/
 	void updateSpawn(DataPacket packet = null) {
-		if (!map)
+		import packets.spawnpacket;
+		
+		DataPacket rmvSpawn;
+		scope(exit) rmvSpawn = null;
+						
+		if (etype == EntityType.item)
+			rmvSpawn = new ItemSpawnPacket(uid, 0, 0, 0, ItemDropType.remove);
+		else
+			rmvSpawn = new GeneralDataPacket(uid, 0, 0, DataAction.removeEntity);
+							
+		// clear screen
+		scope auto scos = getScreenObjects();
+		if (scos && scos.length > 0) {
+			foreach (local; taskPool.parallel(scos)) {
+				import maps.space;
+				if (!map || !local.map
+					||local.mapId != mapId ||
+					!validDistance!ushort(local.x, local.y, x, y)) {
+					m_screenObjects.remove(local.uid);
+					if (local.m_screenObjects.contains(uid))
+						local.m_screenObjects.remove(uid);
+				
+					if (etype == EntityType.player) {
+						DataPacket localRmvSpawn;
+						scope(exit) localRmvSpawn = null;
+						
+						if (local.etype == EntityType.item)
+							localRmvSpawn = new ItemSpawnPacket(local.uid, 0, 0, 0, ItemDropType.remove);
+						else
+							localRmvSpawn = new GeneralDataPacket(local.uid, 0, 0, DataAction.removeEntity);
+						
+						auto client = cast(GameClient)this;
+						client.send(localRmvSpawn);
+					}
+					
+					if (local.etype == EntityType.player) {
+						auto localClient = cast(GameClient)local;
+						localClient.send(rmvSpawn);
+					}
+				}
+			}
+		}
+		
+		if(!map)
 			return;
-		scope auto locals = (map.findLocalEntities(x, y) ~ map.findLocalItems(x, y) ~ getScreenObjects());
-		if (!locals || locals.length == 0)
-			return;
+		
+		// get new locals ...
 		scope auto spawn = createSpawn();
 		if (spawn is null)
 			return;
+
+		scope auto locals = (map.findLocalEntities(x, y) ~ map.findLocalItems(x, y));
+		if (!locals || locals.length == 0)
+			return;
 		
-		synchronized {
-			foreach (local; locals) {
-				if (local.uid == uid)
-					continue;
-				bool inScreen = m_screenObjects.contains(local.uid);
-				if (!inScreen) {
-					m_screenObjects.add(local.uid, local);
-					
-					if (etype == EntityType.player) {
-						auto client = cast(GameClient)this;
-						scope auto lspawn = local.createSpawn();
-						client.send(lspawn);
-					}
-				}
+		foreach(i, ref local; taskPool.parallel(locals)) {
+			if (local.uid == uid)
+				continue;
+			if (etype == EntityType.player) {
+				auto client = cast(GameClient)this;
+				scope auto localSpawn = local.createSpawn();
+				if (localSpawn)
+					client.send(localSpawn);
+			}
+			
+			if (local.etype == EntityType.player) {
+				auto localClient = cast(GameClient)local;
+				if (!m_screenObjects.contains(local.uid))
+					localClient.send(spawn);
 				
-				if (local.etype == EntityType.player) {
-					auto player = cast(GameClient)local;
-					if (!inScreen)
-						player.send(spawn);
-					if (packet !is null)
-						player.send(packet);
-				}
+				if (packet !is null)
+					localClient.send(packet);
+			}
+			
+			if (!m_screenObjects.contains(local.uid))
+				m_screenObjects.add(local.uid, local);
+			
+			if (!local.m_screenObjects.contains(uid)) {
+				local.m_screenObjects.add(uid, this);
 			}
 		}
 	}
-	
+
 	auto getScreenObjects() {
 		if (m_screenObjects)
 			return m_screenObjects.values;

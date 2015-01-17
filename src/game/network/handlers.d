@@ -36,6 +36,7 @@ void handleDisconnect(GameClient client, string reason) {
 	if (client.map !is null) {
 		client.map.remove(client);
 		client.clearSpawn();
+		//client.clearSpawn();
 	}
 	
 	if (!client.loaded)

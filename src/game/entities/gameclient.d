@@ -902,8 +902,10 @@ public:
 			if (!locals || locals.length == 0)
 				return;
 				
-			synchronized {
-				foreach (local; locals) {
+			//synchronized {
+				import std.parallelism : taskPool;
+				foreach(i, ref local; taskPool.parallel(locals)) {
+				//foreach (local; locals) {
 					if (local.uid == uid)
 						continue;
 					if (local.etype == EntityType.player) {
@@ -911,7 +913,7 @@ public:
 						player.send(packet);
 					}
 				}
-			}
+			//}
 		}
 		catch {
 			disconnect("Failed to send...");

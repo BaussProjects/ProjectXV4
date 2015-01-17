@@ -1,5 +1,9 @@
 module maps.map;
 
+import std.parallelism : taskPool;
+import std.array;
+import std.algorithm : filter;
+
 import threading.dict;
 import maps.space;
 import maps.mapobject;
@@ -165,9 +169,13 @@ public:
 	*/
 	auto findEntityByName(string name) {
 		synchronized {
-			foreach (e; entities.values)
+			foreach(i, ref e; taskPool.parallel(entities.values)) {
 				if (e.name == name)
 					return e;
+			}
+			/*foreach (e; entities.values)
+				if (e.name == name)
+					return e;*/
 		}
 		return null;
 	}
@@ -180,9 +188,13 @@ public:
 	*/
 	auto findItemByName(string name) {
 		synchronized {
-			foreach (i; items.values)
+			foreach(c, ref i; taskPool.parallel(items.values)) {
 				if (i.name == name)
 					return i;
+			}
+			/*foreach (i; items.values)
+				if (i.name == name)
+					return i;*/
 		}
 		return null;
 	}
@@ -197,12 +209,14 @@ public:
 	*/
 	auto findEntitiesInRange(ushort x, ushort y, ushort distance) {
 		synchronized {
-			MapObject[] res;
+			scope auto points = filter!(e => inRange!ushort(x, y, e.x, e.y, distance))(entities.values);
+			return points.array;
+			/*MapObject[] res;
 			foreach (e; entities.values) {
 				if (inRange!ushort(e.x, e.y, x, y, distance))
 					res ~= e;
 			}
-			return res;
+			return res;*/
 		}
 	}
 	
@@ -216,12 +230,14 @@ public:
 	*/
 	auto findItemsInRange(ushort x, ushort y, ushort distance) {
 		synchronized {
-			MapObject[] res;
+			scope auto points = filter!(i => inRange!ushort(x, y, i.x, i.y, distance))(items.values);
+			return points.array;
+			/*MapObject[] res;
 			foreach (i; items.values) {
 				if (inRange!ushort(i.x, i.y, x, y, distance))
 					res ~= i;
 			}
-			return res;
+			return res;*/
 		}
 	}
 	

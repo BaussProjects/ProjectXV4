@@ -294,6 +294,7 @@ public:
 				
 				import std.stdio : writefln;
 				writefln("[LV.%s]%s has logged in!", client.level, client.name);
+				client.teleport(client.map, client.x, client.y); // update screen ... cba to debug this right now... temp fix
 			}
 			break;
 		}

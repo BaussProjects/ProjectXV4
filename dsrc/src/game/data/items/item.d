@@ -777,12 +777,12 @@ public:
 		writeln("Dropping");
 		synchronized {
 			teleport(map, x, y);
-			writeln("Teleported");
+			writeln("Dropped");
 			import threading.task;
 			addTask({
 				writeln("Removed");
-				map.remove(this);
-				this.clearSpawn();
+				teleport(map, 0, 0);
+				//fullScreenUpdate();
 			}, 100); // 100 ticks = 10 seconds
 			writeln("Added task");
 		}

@@ -59,9 +59,10 @@ public:
 	*		i =		The item reference.
 	*	Returns: True if the item was added, false if the inventory is full.
 	*/
-	bool addItem(Item i) {
+	bool addItem(Item i, byte pos = -1) {
 		synchronized {
-			auto pos = findPosition();
+			if (pos == -1)
+				pos = findPosition();
 			if (pos == -1) {
 				m_owner.send(createSystemMessage(INVENTORY_FULL));
 				return false;

@@ -12,6 +12,6 @@ import entities.gameclient;
 */
 void handleGetSurroundings(GameClient client, GeneralDataPacket packet) {
 	// Map Info ...
-	client.clearSpawn();
+	//client.clearSpawn();
 	client.updateSpawn();
 }

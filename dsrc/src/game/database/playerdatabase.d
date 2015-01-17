@@ -130,7 +130,7 @@ bool loadPlayer(GameClient client) {
 					client.inventory.addItem(
 						Item.fromString(
 							invIni.read!string(posStr)
-						)
+						), pos
 					);
 				}
 			}
