@@ -1,7 +1,9 @@
 module core.kernel;
 
+import std.algorithm : filter;
+import std.array;
+
 import data.item;
-import std.stdio : writeln;
 
 /**
 *	The base item stats.
@@ -61,4 +63,57 @@ ubyte getBaseJob(ubyte job) {
 		return 40;
 	else
 		return 100;
+}
+
+import entities.gameclient;
+private shared GameClient[uint] _clients;
+
+GameClient[] getClientsByAccount(string account) {
+	synchronized {
+		auto clients = cast(GameClient[uint])_clients;
+		scope auto matchingClients = filter!(e => e.account == account)(clients.values).array;
+		if (!matchingClients || matchingClients.length == 0)
+			return null;
+		return matchingClients;
+	}
+}
+
+GameClient getClientByName(string name) {
+	synchronized {
+		auto clients = cast(GameClient[uint])_clients;
+		scope auto matchingClients = filter!(e => e.name == name)(clients.values).array;
+		if (!matchingClients || matchingClients.length == 0)
+			return null;
+		return matchingClients.front;
+	}
+}
+
+GameClient getClientByUID(uint uid) {
+	synchronized {
+		auto clients = cast(GameClient[uint])_clients;
+		scope auto matchingClients = filter!(e => e.uid == uid)(clients.values).array;
+		if (!matchingClients || matchingClients.length == 0)
+			return null;
+		return matchingClients.front;
+	}
+}
+
+bool containsClient(GameClient client) {
+	return getClientByUID(client.uid) !is null;
+}
+
+void addClient(GameClient client) {
+	synchronized {
+		auto clients = cast(GameClient[uint])_clients;
+		clients[client.entityUID] = client;
+		_clients = cast(shared(GameClient[uint]))clients;
+	}
+}
+
+void removeClient(GameClient client) {
+	synchronized {
+		auto clients = cast(GameClient[uint])_clients;
+		clients.remove(client.entityUID);
+		_clients = cast(shared(GameClient[uint]))clients;
+	}
 }

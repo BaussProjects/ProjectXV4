@@ -33,7 +33,6 @@ enum UpdateType : uint {
 	heavensBlessing = 0x12
 }
 
-
 /*
 enum UpdateType : uint
 {
@@ -78,7 +77,7 @@ import packets.packethandler : PacketType;
 */
 class UpdatePacket : DataPacket {
 public:	
-	/**
+	/+/**
 	*	Creates a new instance of UpdatePacket.
 	*	Params:
 	*		uid =		The uid.
@@ -86,12 +85,7 @@ public:
 	*		value =		The value.
 	*/
 	this(uint uid, UpdateType update, ushort value) {
-		super(PacketType.update, 20);
-		
-		write!uint(uid);
-		write!uint(1);
-		write!uint(cast(uint)update);
-		write!ushort(value);
+		this(uid, update, cast(ulong)value);
 	}
 	
 	/**
@@ -102,14 +96,9 @@ public:
 	*		value =		The value.
 	*/
 	this(uint uid, UpdateType update, uint value) {
-		super(PacketType.update, 20);
-		
-		write!uint(uid);
-		write!uint(1);
-		write!uint(cast(uint)update);
-		write!uint(value);
+		this(uid, update, cast(ulong)value);
 	}
-	
+	+/
 	/**
 	*	Creates a new instance of UpdatePacket.
 	*	Params:
@@ -134,7 +123,7 @@ public:
 	*		value =		The value.
 	*/
 	this(uint uid, UpdateType update, short value) {
-		super(PacketType.update, 20);
+		super(PacketType.update, 24);
 		
 		write!uint(uid);
 		write!uint(1);

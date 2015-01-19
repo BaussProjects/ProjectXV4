@@ -71,11 +71,26 @@ import packets.packethandler : Packet, PacketType;
 	}
 	client.account = account;
 	client.entityUID = auth.entityUID;
-			
+	
+	import core.kernel;
+	auto matches = getClientsByAccount(client.account);
+	if (matches) {
+		import std.parallelism;
+		foreach (match; taskPool.parallel(matches)) {
+			match.disconnect("Multi login...");
+			if (containsClient(match)) {
+				removeClient(match);
+			}
+		}
+		client.disconnect("Multi login...");
+		return;
+	}
+	
 	if (playerExists(account)) {
 		client.setDb();
 		
 		if (loadPlayer(client)) {
+			addClient(client);
 			client.send(createLoginMessage(ANSWER_OK));
 			import packets.datetime;
 			import packets.characterinfo;

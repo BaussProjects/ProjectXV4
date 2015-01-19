@@ -169,15 +169,11 @@ public:
 	*/
 	auto findEntityByName(string name) {
 		synchronized {
-			foreach(i, ref e; taskPool.parallel(entities.values)) {
-				if (e.name == name)
-					return e;
-			}
-			/*foreach (e; entities.values)
-				if (e.name == name)
-					return e;*/
+			scope auto entities = filter!(e => e.name == name)(entities.values).array;
+			if (!entities || entities.length == 0)
+				return null;
+			return entities.front;
 		}
-		return null;
 	}
 	
 	/**
@@ -188,15 +184,41 @@ public:
 	*/
 	auto findItemByName(string name) {
 		synchronized {
-			foreach(c, ref i; taskPool.parallel(items.values)) {
-				if (i.name == name)
-					return i;
-			}
-			/*foreach (i; items.values)
-				if (i.name == name)
-					return i;*/
+			scope auto _items = filter!(i => i.name == name)(items.values).array;
+			if (!_items || _items.length == 0)
+				return null;
+			return _items.front;
 		}
-		return null;
+	}
+	
+		/**
+	*	Finds an entity by its uid.
+	*	Params:
+	*		uid =	The uid to search by.
+	*	Returns: The map object of the entity, null if not found.
+	*/
+	auto findEntityByUID(uint uid) {
+		synchronized {
+			scope auto entities = filter!(e => e.uid == uid)(entities.values).array;
+			if (!entities || entities.length == 0)
+				return null;
+			return entities.front;
+		}
+	}
+	
+	/**
+	*	Finds an item by its uid.
+	*	Params:
+	*		uid =	The uid to search by.
+	*	Returns: The map object of the item, null if not found.
+	*/
+	auto findItemByUID(uint uid) {
+		synchronized {
+			scope auto _items = filter!(i => i.uid == uid)(items.values).array;
+			if (!_items || _items.length == 0)
+				return null;
+			return _items.front;
+		}
 	}
 	
 	/**
@@ -211,12 +233,6 @@ public:
 		synchronized {
 			scope auto points = filter!(e => inRange!ushort(x, y, e.x, e.y, distance))(entities.values);
 			return points.array;
-			/*MapObject[] res;
-			foreach (e; entities.values) {
-				if (inRange!ushort(e.x, e.y, x, y, distance))
-					res ~= e;
-			}
-			return res;*/
 		}
 	}
 	
@@ -232,12 +248,6 @@ public:
 		synchronized {
 			scope auto points = filter!(i => inRange!ushort(x, y, i.x, i.y, distance))(items.values);
 			return points.array;
-			/*MapObject[] res;
-			foreach (i; items.values) {
-				if (inRange!ushort(i.x, i.y, x, y, distance))
-					res ~= i;
-			}
-			return res;*/
 		}
 	}
 	

@@ -270,6 +270,19 @@ public:
 		case DataAction.hotKeys: handleHotKeys(client, generalData); break;
 		case DataAction.confirmAssociates: handleConfirmAssociates(client, generalData); break;
 		case DataAction.jump: handleJump(client, generalData); break;
+		case DataAction.requestEntity: {
+			uint uid = generalData.dwParam1;
+			auto request = client.map.findEntityByUID(uid);
+			if (request)
+			{
+				import enums.entitytype;
+				if (request.etype == EntityType.player) {
+					(cast(GameClient)request).send(client.createSpawn());
+				}
+				client.send(request.createSpawn());
+			}
+			break;
+		}
 		
 		// <change.d>
 		case DataAction.changePkMode: handleChangePK(client, generalData); break;
@@ -282,6 +295,17 @@ public:
 		case DataAction.confirmGuild:
 			client.send(generalData);
 			break;
+			
+		case DataAction.enterPortal: {
+			import database.portaldatabase;
+			auto portal = getPortal(client.mapId, client.x, client.y);
+			if (portal.map != 0) {
+				client.teleport(portal.map, portal.x, portal.y);
+			}
+			else
+				client.pullBack();
+			break;
+		}
 			
 		case DataAction.login: {
 			if (!client.loaded) {

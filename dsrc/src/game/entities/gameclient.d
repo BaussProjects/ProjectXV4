@@ -1,6 +1,7 @@
 module entities.gameclient;
 
 import std.socket;
+import std.array : replace;
 
 import network.handlers;
 import network.packet : DataPacket;
@@ -13,6 +14,8 @@ import enums.job;
 import enums.entitytype;
 import enums.action;
 import enums.pkmode;
+import enums.playerpermission;
+
 import maps.mapobject;
 import maps.map;
 
@@ -225,6 +228,11 @@ private:
 	Equipments m_equipments;
 	
 	/**
+	*	The player permission.
+	*/
+	PlayerPermission m_permission = PlayerPermission.player;
+	
+	/**
 	*	The db file for the character.
 	*/
 	IniFile!(true) m_playerDbFile;
@@ -331,6 +339,69 @@ public:
 		GameCrypto crypto() { return m_crypto; }
 		
 		// Player properties ...
+		/**
+		*	Gets the player permission.
+		*/
+		PlayerPermission permission() { return m_permission; }
+		/**
+		*	Sets the player permission.
+		*/
+		void permission(PlayerPermission value) {
+			// Removes current name settings ...
+			switch (m_permission) {
+				case PlayerPermission.owner:
+					super.name = replace(super.name, "[ADM]", "");
+					break;
+				case PlayerPermission.projectManager:
+					super.name = replace(super.name, "[PM]", "");
+					break;
+				case PlayerPermission.developer:
+					super.name = replace(super.name, "[D]", "");
+					break;
+				case PlayerPermission.gameMaster:
+					super.name = replace(super.name, "[GM]", "");
+					break;
+				case PlayerPermission.gameModerator:
+					super.name = replace(super.name, "[M]", "");
+					break;
+				case PlayerPermission.forumModerator:
+					super.name = replace(super.name, "[F]", "");
+					break;
+				case PlayerPermission.premium:
+					super.name = replace(super.name, "[V]", "");
+					break;
+				default: break;
+			}
+			m_permission = value;
+			// Sets new name ...
+			switch (m_permission) {
+				case PlayerPermission.owner:
+					super.name = (super.name ~ "[ADM]");
+					break;
+				case PlayerPermission.projectManager:
+					super.name = (super.name ~ "[PM]");
+					break;
+				case PlayerPermission.developer:
+					super.name = (super.name ~ "[D]");
+					break;
+				case PlayerPermission.gameMaster:
+					super.name = (super.name ~ "[GM]");
+					break;
+				case PlayerPermission.gameModerator:
+					super.name = (super.name ~ "[M]");
+					break;
+				case PlayerPermission.forumModerator:
+					super.name = (super.name ~ "[F]");
+					break;
+				case PlayerPermission.premium:
+					super.name = (super.name ~ "[V]");
+					break;
+				default: break;
+			}
+			
+			super.fullUpdateSpawn();
+		}
+		
 		/**
 		*	Gets the loading state.
 		*/
@@ -966,12 +1037,16 @@ public:
 		spawn.writeEmpty(23);
 		spawn.write!ubyte(0); // 23 guildRank
 		
-		spawn.write!uint(0); // 24 garment
-		spawn.write!uint(0); // 28 helmet
-		spawn.write!uint(0); // 32 armor
-		spawn.write!uint(0); // 36 right hand
-		spawn.write!uint(0); // 40 left hand
-		
+		import packets.item : ItemPosition;
+		foreach (ipos; [9, 1, 3, 4, 5]) {
+			auto pos = cast(ItemPosition)ipos;
+			if (equipments.containsMask(pos))
+				spawn.write!uint(equipments.getMaskByPosition(pos));
+			else if (equipments.contains(pos))
+				spawn.write!uint(equipments.getEquipByPositionn(pos).id);
+			else
+				spawn.write!uint(0);
+		}
 		spawn.writeEmpty(48);
 		spawn.write!ushort(cast(ushort)maxHp); // 48
 		spawn.write!ushort(level); // 50

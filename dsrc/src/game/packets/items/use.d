@@ -18,12 +18,11 @@ void handleUse(GameClient client, ItemUsagePacket item) {
 	auto i = client.inventory.getItemByUID(uid);
 	if (i !is null) {
 		if (!i.isMisc()) {
-			client.inventory.removeItemByUID(uid);
-			if (!client.equipments.equip(i, pos)) {
-				// REPORT ERRORS ...
+			if (client.equipments.equip(i, pos)) {
+				client.inventory.removeItemByUID(uid);
 			}
 		} else {
-			final switch (i.id) {
+			switch (i.id) {
 				case 1000000:
 				case 1000010:
 				case 1000020:
@@ -33,6 +32,11 @@ void handleUse(GameClient client, ItemUsagePacket item) {
 				case 1002050: {
 					import packets.items.handlers.hppotions;
 					useHpPotion(client, i);
+					break;
+				}
+				
+				default: {
+					// can't use ...
 					break;
 				}
 			}

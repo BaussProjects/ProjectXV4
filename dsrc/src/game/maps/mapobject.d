@@ -222,7 +222,13 @@ public:
 				newMap = new Map(mapId, mapId, MapType.safe, to!string(mapId));
 				addMap(newMap);
 			}
-			newMap.load(mapId);
+			import threading.task;
+			addTask({
+				synchronized {
+					newMap.load(mapId); // Loads the dmap in the task thread ...
+				}
+			}, 1);
+			
 			teleport(newMap, x, y);
 		}
 		else if (x != m_x || y != m_y) {
@@ -240,7 +246,7 @@ public:
 	void teleport(Map newMap, ushort x, ushort y) {		
 		if (m_map) {
 			m_map.remove(this);
-		//	clearSpawn();
+			clearSpawn();
 		}
 		
 		m_map = newMap;
@@ -270,11 +276,16 @@ public:
 		teleport(mapId, lastX, lastY);
 	}
 	
+	void fullUpdateSpawn(DataPacket packet = null) {
+		clearSpawn();
+		updateSpawn(packet);
+	}
+	
 	void clearSpawn() {
 		scope auto locals = (map.findLocalEntities(x, y) ~ map.findLocalItems(x, y) ~ getScreenObjects());
 		if (!locals || locals.length == 0)
 			return;
-		m_screenObjects = null;
+		m_screenObjects.clear();
 		
 		DataPacket rmvSpawn;
 		scope(exit) rmvSpawn = null;
@@ -370,10 +381,12 @@ public:
 			if (local.uid == uid)
 				continue;
 			if (etype == EntityType.player) {
-				auto client = cast(GameClient)this;
-				scope auto localSpawn = local.createSpawn();
-				if (localSpawn)
-					client.send(localSpawn);
+				if (!m_screenObjects.contains(local.uid)) {
+					auto client = cast(GameClient)this;
+					scope auto localSpawn = local.createSpawn();
+					if (localSpawn)
+						client.send(localSpawn);
+				}
 			}
 			
 			if (local.etype == EntityType.player) {

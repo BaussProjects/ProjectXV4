@@ -147,6 +147,7 @@ public:
 	scope auto item = new ItemUsagePacket(packet);
 	
 	import packets.items.use;
+	import packets.items.removeinventory;
 	
 	switch (item.action) {
 		case ItemAction.ping: {
@@ -156,13 +157,7 @@ public:
 		
 		case ItemAction.equip: handleUse(client, item); break;
 		case ItemAction.unequip: handleUnequip(client, item); break;
-		
-		case ItemAction.removeInventory: {
-			auto i = client.inventory.getItemByUID(item.uid, true);
-			if (i !is null)
-				i.drop(client.map, client.x, client.y);
-			break;
-		}
+		case ItemAction.removeInventory: handleRemoveInventory(client, item); break;
 		
 		default: {
 			import std.stdio : writefln;

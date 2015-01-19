@@ -39,6 +39,9 @@ void handleDisconnect(GameClient client, string reason) {
 		//client.clearSpawn();
 	}
 	
+	import core.kernel;
+	removeClient(client);
+	
 	if (!client.loaded)
 		writefln("Disconnection from %s Reason: %s", client.address, reason);
 	else {

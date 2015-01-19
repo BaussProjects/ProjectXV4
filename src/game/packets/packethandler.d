@@ -17,7 +17,7 @@ enum PacketType : ushort {
 	itemUsage = 1009,
 	generaldata = 1010,
 	entityspawn = 1014,
-	update = 10017,
+	update = 1017,
 	groundobject = 1101
 }
 

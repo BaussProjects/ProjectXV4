@@ -22,6 +22,9 @@ protected:
 	this(ushort type, ushort size) {
 		super(type, size);
 	}
+	this(DataPacket packet) {
+		super(packet);
+	}
 }
 
 /**
@@ -49,6 +52,13 @@ enum ItemDropType : ushort {
 	item
 */
 class ItemSpawnPacket : SpawnPacket {
+private:
+	uint m_uid;
+	uint m_id;
+	ushort m_x;
+	ushort m_y;
+	ItemDropType m_type;
+public:
 	this(uint uid, uint id, ushort x, ushort y, ItemDropType dropType) {
 		super(PacketType.groundobject, 20);
 		
@@ -57,5 +67,35 @@ class ItemSpawnPacket : SpawnPacket {
 		write!ushort(x);
 		write!ushort(y);
 		write!ushort(cast(ushort)dropType);
+	}
+	
+	this(DataPacket packet) {
+		super(packet);
+		
+		go(4);
+		m_uid = read!uint;
+		m_id = read!uint;
+		m_x = read!ushort;
+		m_y = read!ushort;
+		m_type = cast(ItemDropType)read!ushort;
+	}
+	
+	@property {
+		uint uid() { return m_uid; }
+		uint id() { return m_id; }
+		ushort x() { return m_x; }
+		ushort y() { return m_y; }
+		ItemDropType type() { return m_type; }
+	}
+}
+
+import entities.gameclient;
+@Packet(PacketType.groundobject) void handleGroundObject(GameClient client, DataPacket packet) {
+	scope auto groundObject = new ItemSpawnPacket(packet);
+	
+	auto i = client.map.findItemByUID(groundObject.uid);
+	if (i) {
+		import data.item;
+		(cast(Item)i).pickUp(client);
 	}
 }

@@ -118,6 +118,10 @@ bool loadPlayer(GameClient client) {
 		client.avatar = ini.read!ushort("Avatar");
 		client.hairStyle = ini.read!ushort("HairStyle");
 		
+		// Misc
+		import enums.playerpermission;
+		client.permission = cast(PlayerPermission)ini.read!ubyte("Permission");
+		
 		client.updateStatPoints();
 		client.updateBaseStats();
 	}
@@ -336,8 +340,14 @@ bool createPlayer(string account, string name, Job job, ushort mesh) {
 		
 		// Look
 		ini.write!ushort("Model", mesh);
-		ini.write!ushort("Avatar", 112);
+		if (mesh < 2000)
+			ini.write!ushort("Avatar", 46);
+		else
+			ini.write!ushort("Avatar", 213);
 		ini.write!ushort("HairStyle", 410);
+		
+		// Misc
+		ini.write!ubyte("Permission", 7); // Player ...
 		
 		ini.close();
 		

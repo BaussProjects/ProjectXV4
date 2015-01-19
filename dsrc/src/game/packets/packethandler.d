@@ -17,7 +17,7 @@ enum PacketType : ushort {
 	itemUsage = 1009,
 	generaldata = 1010,
 	entityspawn = 1014,
-	update = 10017,
+	update = 1017,
 	groundobject = 1101
 }
 
@@ -43,12 +43,14 @@ void handlePackets(GameClient client, DataPacket packet) {
 import packets.generaldata;
 import packets.itemusage;
 import packets.movement;
+import packets.spawnpacket;
 import packets.authmessage;
 import packets.createcharacter;
 import packets.message;
 case PacketType.generaldata: handleGeneralData(client,packet); break;
 case PacketType.itemUsage: handleItemUsage(client,packet); break;
 case PacketType.movement: handleMovement(client,packet); break;
+case PacketType.groundobject: handleGroundObject(client,packet); break;
 case PacketType.authmessage: handleAuthMessage(client,packet); break;
 case PacketType.createCharacter: handleCreateCharacter(client,packet); break;
 case PacketType.message: handleMessage(client,packet); break;

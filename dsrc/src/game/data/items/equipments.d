@@ -23,7 +23,7 @@ public:
 	
 	bool containsMask(ItemPosition pos) {
 		synchronized {
-			return (m_maskedEquips.get(pos, -1) >= 0);
+			return (m_maskedEquips.get(pos, 0) > 0);
 		}
 	}
 	
@@ -86,7 +86,7 @@ public:
 			item.send(m_owner, ItemMode.def, pos);
 			m_owner.send(new ItemUsagePacket(item.uid, ItemAction.equip, cast(uint)pos));
 			m_owner.send(new ItemUsagePacket(item.uid, ItemAction.setEquipPosition, cast(uint)pos));
-			m_owner.updateSpawn();
+			m_owner.fullUpdateSpawn();
 			import database.playerdatabase;
 			updateCharacterEquipments(m_owner, item, cast(ushort)pos);
 			return true;
@@ -108,7 +108,7 @@ public:
 					m_owner.updateBaseStats();
 					item.send(m_owner, ItemMode.def, pos);
 					m_owner.send(new ItemUsagePacket(item.uid, ItemAction.unequip, cast(uint)pos));
-					m_owner.updateSpawn();
+					m_owner.fullUpdateSpawn();
 					import database.playerdatabase;
 					removeCharacterEquipments(m_owner, cast(ushort)pos);
 					return true;

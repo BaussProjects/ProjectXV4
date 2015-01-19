@@ -136,6 +136,10 @@ private:
 	*	The reborn effect.
 	*/
 	short m_rbEffect;
+	/**
+	*	Ground item id.
+	*/
+	ushort m_groundItemId;
 public:
 	/**
 	*	Creates a new instance of Item.
@@ -777,30 +781,52 @@ public:
 	}
 	
 	import maps.map;
-	import std.stdio : writeln;
+	
 	void drop(Map map, ushort x, ushort y) {
-		writeln("Dropping");
 		synchronized {
 			teleport(map, x, y);
-			writeln("Dropped");
 			import threading.task;
+			uint dropId = m_groundItemId;
 			addTask({
-				writeln("Removed");
-				teleport(map, 0, 0);
-				//fullScreenUpdate();
-			}, 100); // 100 ticks = 10 seconds
-			writeln("Added task");
+				if (!dropId == m_groundItemId) {
+					teleport(map, 0, 0);
+					map.remove(this);
+				}
+			}, 250);
 		}
 	}
 	
 	void pickUp(GameClient client) {
 		synchronized {
-			if (client.inventory.addItem(this)) {
-				this.teleport(this.map, 0, 0);
-				//this.map.remove(this);
-				//this.clearSpawn();
-				/*map.remove(this);
-				this.clearSpawn();*/
+			if (client.x != x && client.y != y)
+				return;
+			m_groundItemId++;
+			if (id == 1090000) {
+				client.money = (client.money + 25);
+				teleport(map, 0, 0);
+			}
+			else if (id == 1090010) {
+				client.money = (client.money + 50);
+				teleport(map, 0, 0);
+			}
+			else if (id == 1090020) {
+				client.money = (client.money + 150);
+				teleport(map, 0, 0);
+			}
+			else if (id == 1091000) {
+				client.money = (client.money + 1000);
+				teleport(map, 0, 0);
+			}
+			else if (id == 1091010) {
+				client.money = (client.money + 2500);
+				teleport(map, 0, 0);
+			}
+			else if (id == 1091020) {
+				client.money = (client.money + 5000);
+				teleport(map, 0, 0);
+			}
+			else if (client.inventory.addItem(this)) {
+				teleport(map, 0, 0);
 			}
 		}
 	}

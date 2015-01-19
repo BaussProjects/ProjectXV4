@@ -209,9 +209,30 @@ public:
 		return;
 	}
 	
+	if (msg.from != client.name) {
+		client.disconnect("Invalid message name");
+		return;
+	}
+	
 	switch (msg.messageType) {
 		case MessageType.talk: {
 			client.sendToScreen(msg);
+			break;
+		}
+		
+		case MessageType.whisper: {
+			import core.kernel;
+			auto match = getClientByName(msg.to);
+			if (!match) {
+				import std.string : format;
+				import packets.messagecore;
+				import core.msgconst;
+				client.send(createSystemMessage(format(PLAYER_OFFLINE_WHISPER, msg.to)));
+			}
+			else {
+				scope auto whisper = new MessagePacket(msg.messageType, msg.color, msg.from, msg.to, msg.message, msg.time, match.mesh, client.mesh);
+				match.send(whisper);
+			}
 			break;
 		}
 		

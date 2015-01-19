@@ -24,3 +24,6 @@ const string CMD_FORMAT = "Invalid format. The correct format is %s";
 
 // Inventory
 const string INVENTORY_FULL = "Your inventory is full.";
+
+// Chat
+const string PLAYER_OFFLINE_WHISPER = "%s seem to be offline!";

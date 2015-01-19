@@ -7,6 +7,8 @@ bool loadDatabase() {
 	try {
 		import database.statsdatabase;
 		loadStats();
+		import database.portaldatabase;
+		loadPortals();
 		import database.mapdatabase;
 		loadMaps();
 		import database.itemsdatabase;

@@ -85,6 +85,12 @@ public:
 		}
 	}
 	
+	void clear() {
+		synchronized {
+			m_values = null;
+		}
+	}
+	
 	@property {
 		/**
 		*	Gets the values.

@@ -22,7 +22,7 @@ void handleCommands(GameClient client, string[] command, string commandText) {
 		case "item": cmd_item(client, command); break;
 		case "ritem": cmd_ritem(client, command); break;
 		case "clearinv": cmd_clearinv(client); break;
-		
+		case "ditem2": cmd_ditem(client, command); break;
 		default: {
 			break;
 		}
@@ -107,5 +107,16 @@ private {
 	
 	void cmd_clearinv(GameClient client) {
 		client.inventory.clear();
+	}
+	
+	void cmd_ditem(GameClient client, string[] command) {
+		uint itemid;
+		if (command.length != 2 || !tryParse!uint(command[1], itemid)) {
+			reportFormat(client, "@ditem id | /ditem id");
+			return;
+		}
+		import core.kernel;
+		auto i = getKernelItem(itemid);
+		i.drop(client.map, client.x, client.y);
 	}
 }
